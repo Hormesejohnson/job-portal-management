@@ -1,13 +1,16 @@
+import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
 import { BriefcaseBusiness, Search, MapPin, ArrowRight } from 'lucide-react'
 import { selectJobs } from '../../features/jobs/jobsSelectors'
+import { selectJobsLoading } from '../../features/jobs/jobsSelectors'
+import { fetchJobs } from '../../features/jobs/jobsSlice'
 import JobCard from '../../components/jobs/JobCard'
 import Header from '../../components/layout/Header'
 import Footer from '../../components/layout/Footer'
-import { useState } from 'react'
 import { clearFilters, setLocation, setSearch } from '../../features/filters/filtersSlice'
 import { locations } from '../../mock/seedData'
+import LoadingSpinner from '../../components/common/LoadingSpinner'
 
 const Home = () => {
   const dispatch = useDispatch()
@@ -16,9 +19,14 @@ const Home = () => {
   const [keyword, setKeyword] = useState('')
   const [location, setLocationValue] = useState('')
   const jobs = useSelector(selectJobs)
+  const loading = useSelector(selectJobsLoading)
   const activeJobs = jobs.filter((job) => job.status === 'Active')
   const featuredJobs = activeJobs.filter((job) => job.featured).slice(0, 6)
   const categories = [...new Set(activeJobs.map((job) => job.category))].slice(0, 6)
+
+  useEffect(() => {
+    dispatch(fetchJobs())
+  }, [dispatch])
 
   const handleSearch = (event) => {
     event.preventDefault()
@@ -74,6 +82,7 @@ const Home = () => {
                 <div className="rounded-2xl bg-white p-5 text-slate-900 shadow-xl">
                   <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Trending roles</p>
                   <ul className="mt-4 space-y-3">
+                    {loading && <li><LoadingSpinner label="Loading trending roles..." /></li>}
                     {featuredJobs.slice(0, 4).map((job) => (
                       <li key={job.id}>
                         <Link
@@ -108,11 +117,15 @@ const Home = () => {
             </div>
             <Link to="/jobs" className="hidden items-center gap-2 text-sm font-semibold text-teal-700 md:inline-flex">View all jobs <ArrowRight size={16} /></Link>
           </div>
-          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-            {featuredJobs.map((job) => (
-              <JobCard key={job.id} job={job} />
-            ))}
-          </div>
+          {loading ? (
+            <LoadingSpinner label="Loading featured jobs..." />
+          ) : (
+            <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+              {featuredJobs.map((job) => (
+                <JobCard key={job.id} job={job} />
+              ))}
+            </div>
+          )}
         </section>
 
         <section className="bg-white">

@@ -26,6 +26,13 @@ const JobListings = () => {
   const roleFilter = query.get('search') || ''
   const categoryFilter = query.get('category') || ''
 
+  const handleClearFilters = () => {
+    dispatch(clearFilters())
+    if (roleFilter || categoryFilter) {
+      navigate(routeLocation.pathname, { replace: true })
+    }
+  }
+
   useEffect(() => {
     dispatch(fetchJobs())
   }, [dispatch])
@@ -80,7 +87,7 @@ const JobListings = () => {
     <div className="space-y-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
       <div className="flex items-center justify-between">
         <h3 className="font-semibold text-slate-800">Filters</h3>
-        <button onClick={() => dispatch(clearFilters())} className="text-xs font-medium text-blue-600">Clear all</button>
+        <button onClick={handleClearFilters} className="text-xs font-medium text-blue-600">Clear all</button>
       </div>
 
       <div>
@@ -158,7 +165,7 @@ const JobListings = () => {
             {loading ? (
               <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3"><LoadingSpinner label="Loading jobs..." /></div>
             ) : currentList.length === 0 ? (
-              <EmptyState title="No jobs found" message="Try changing your filters or search keyword." action={() => dispatch(clearFilters())} actionLabel="Reset filters" />
+              <EmptyState title="No jobs found" message="Try changing your filters or search keyword." action={handleClearFilters} actionLabel="Reset filters" />
             ) : (
               <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
                 {currentList.map((job, index) => (

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { BarChart3, BriefcaseBusiness, FileText, FolderKanban, Home as HomeIcon, LogOut, Menu, Users, X } from 'lucide-react'
@@ -35,16 +35,8 @@ const AdminDashboard = () => {
       .finally(() => setLoading(false))
   }, [dispatch])
 
-  const stats = useMemo(() => {
-    const activeJobs = jobs.filter((job) => job.status === 'Active').length
-    const inactiveJobs = jobs.filter((job) => job.status === 'Inactive').length
-    return {
-      totalJobs: jobs.length,
-      activeJobs,
-      inactiveJobs,
-      totalApplications: applications.length,
-    }
-  }, [jobs, applications])
+  const activeJobs = jobs.filter((job) => job.status === 'Active').length
+  const inactiveJobs = jobs.filter((job) => job.status === 'Inactive').length
 
   const recentJobs = [...jobs].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5)
   const recentApplications = [...applications]
@@ -85,10 +77,10 @@ const AdminDashboard = () => {
 
           <main className="p-4 lg:p-6">
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-              <StatCard title="Total jobs" value={stats.totalJobs} icon={BriefcaseBusiness} accent="bg-blue-100 text-blue-700" />
-              <StatCard title="Active jobs" value={stats.activeJobs} icon={FolderKanban} accent="bg-emerald-100 text-emerald-700" />
-              <StatCard title="Inactive jobs" value={stats.inactiveJobs} icon={FileText} accent="bg-amber-100 text-amber-700" />
-              <StatCard title="Total applications" value={stats.totalApplications} icon={Users} accent="bg-violet-100 text-violet-700" />
+              <StatCard title="Total jobs" value={jobs.length} icon={BriefcaseBusiness} accent="bg-blue-100 text-blue-700" />
+              <StatCard title="Active jobs" value={activeJobs} icon={FolderKanban} accent="bg-emerald-100 text-emerald-700" />
+              <StatCard title="Inactive jobs" value={inactiveJobs} icon={FileText} accent="bg-amber-100 text-amber-700" />
+              <StatCard title="Total applications" value={applications.length} icon={Users} accent="bg-violet-100 text-violet-700" />
             </div>
 
             <div className="mt-8 grid gap-6 xl:grid-cols-[1.3fr_0.7fr]">
